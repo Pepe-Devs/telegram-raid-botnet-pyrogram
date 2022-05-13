@@ -29,7 +29,7 @@ class SpamBlock(SettingsFunction):
 
     def checking_block(self, app):
 
-        self.message = app.get_history('SpamBot', limit=1)
+        self.message = app.get_chat_history('SpamBot', limit=1)
             
         for msg in self.message:
             if msg.text == '/start':

@@ -23,7 +23,7 @@ data = {"storage_sessions": []}
 
 
 if menu == '1':
-	app = Client(session, api_id, api_hash)
+	app = Client(name, api_id, api_hash)
 	with app:
 		me = app.get_me()
 		print([me.first_name])
@@ -35,12 +35,13 @@ elif menu == '2':
 		session = session[:-8]
 
 		try:
-			app = Client(session, api_id, api_hash)
-			app.connect()
+			session_name = Client(session, api_id, api_hash, in_memory=False)
+			session_name.connect()
 			me = app.get_me()
 			string = app.export_session_string()
 			data['storage_sessions'].append(string)
 			print(f'[+]{me.first_name}')
+			print(string)
 
 			app.disconnect() 
 		except Exception as error:

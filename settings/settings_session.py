@@ -13,7 +13,7 @@ except:
     settings_function.add_api()
 
 console = Console()
-    
+
 class ConnectSessions:
     def __init__(self):
         self.initialize = (
@@ -25,8 +25,12 @@ class ConnectSessions:
         with open('sessions/sessions.json', 'r') as json_session:
             sessions = json.load(json_session)['storage_sessions']
             for app in sessions:
-                app=Client(app, api_id, api_hash)
-                self.connect_sessions.append(app)
+                session_name=Client(
+                'app',
+                api_id=api_id,
+                api_hash=api_hash,
+                session_string=app)
+                self.connect_sessions.append(session_name)
         
         if self.initialize:
             with console.status("Initializing"):
