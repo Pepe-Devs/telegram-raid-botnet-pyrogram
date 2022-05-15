@@ -8,8 +8,8 @@ from settings.config import color_number
 
 console = Console(theme=Theme({"repr.number": color_number}))
 
-console.print('''[bold white]
-idea taken from @huis_bn
+console.print('''
+[bold blue]idea taken from @huis_bn
 botnet on telethon: https://github.com/json1c/telegram-raid-botnet
 botnet on pyrogram: https://github.com/Madara225/telegram-raid-botnet-pyrogram
 ''')
@@ -44,9 +44,10 @@ def botnet_main():
                     )
 
     except KeyboardInterrupt:
+        console.print('\n[blue]<https://t.me/pepe_devs>[/]')
         sys.exit()
         
-    #except:
-    #    botnet_main()
+    except:
+        botnet_main()
 
 botnet_main()

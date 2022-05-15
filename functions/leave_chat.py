@@ -26,7 +26,7 @@ class Leavechat:
 			await app.connect()
 
 		
-		async for dialog in app.iter_dialogs():
+		async for dialog in app.get_dialogs():
 			print(dialog.chat.title)
 			try:
 				await app.leave_chat(dialog.chat.id, delete=True)
