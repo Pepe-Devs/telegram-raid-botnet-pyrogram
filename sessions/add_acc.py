@@ -40,7 +40,7 @@ elif menu == '2':
 			me = app.get_me()
 			string = app.export_session_string()
 			data['storage_sessions'].append(string)
-			print(f'[+]{me.first_name}')
+			print(f'[+]{me.first_name} {me.id} {session}')
 
 			app.disconnect() 
 		except Exception as error:

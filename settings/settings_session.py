@@ -43,9 +43,10 @@ class ConnectSessions:
                     
     async def connect_session(self, number, app):
         try:
-            console.log(await app.start())
-            console.log(f'CONNECTED/{True}/{number}')
-            
+            console.log(app)
+            await app.start()
+            console.log(f'CONNECTED/{number}')
+                        
             self.connect_sessions.append(app)
             self.connect_sessions.remove(app)
             

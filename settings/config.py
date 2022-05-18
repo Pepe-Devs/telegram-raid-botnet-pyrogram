@@ -10,7 +10,7 @@ my_id =
 notification = ' '
 
 #количество кругов
-range_acc = 
+range_acc =
 
 #поиск стикера/видео в папке
 stickers = os.listdir('media/')

@@ -22,10 +22,7 @@ class FloodMP(SettingsFunction):
 		
 		self.users = console.input('[bold red]USER[/]> ')
 		self.text_flood = console.input('[bold red]text flood[/]> ')
-		self.delay = console.input('[bold red]delay[/]> ')
-		
-		if not self.delay:
-			self.delay = 0
+		self.delay = Prompt.ask("[bold red]delay[/]", default="0")
 		
 		asyncio.get_event_loop().run_until_complete(
 			asyncio.gather(*[

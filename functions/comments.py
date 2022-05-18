@@ -26,11 +26,8 @@ class FloodComments(SettingsFunction):
 		if not self.message:
 			self.text = [console.input('[bold red]message[/]> ')]
 			
-		self.delay = console.input('[bold blue]delay[/](0)> ')
+		self.delay = Prompt.ask("[bold red]delay[/]", default="0")
 		
-		if not self.delay:
-			self.delay = 0
-			
 		asyncio.get_event_loop().run_until_complete(
 			asyncio.gather(*[
 				self.flood(app)

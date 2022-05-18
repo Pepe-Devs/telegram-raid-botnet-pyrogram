@@ -121,11 +121,8 @@ class FloodChat(SettingsFunction):
 
     def start_process_flood(self):
         self.account_count(self.connect_sessions)
-        self.delay = console.input('[bold blue]delay[/](0)> ')
-        
-        if not self.delay:
-            self.delay = 0
-            
+        self.delay = Prompt.ask("[bold red]delay[/]", default="0")
+                  
         processes = []
 
         for num_accs, session in enumerate(
