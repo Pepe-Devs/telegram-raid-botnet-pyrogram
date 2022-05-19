@@ -107,7 +107,7 @@ class FloodChat(SettingsFunction):
             @app.on_message()
             async def main(client, message):
                 if message.reply_to_message:
-                    reply_msg_id = message.reply_to_message.message_id
+                    reply_msg_id = message.reply_to_message_id
                 else:
                     reply_msg_id = False
 
