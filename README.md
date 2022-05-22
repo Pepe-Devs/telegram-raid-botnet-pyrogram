@@ -8,9 +8,9 @@
 
 `python3 main.py`
 
-авторизуемся: https://my.telegram.org/
+Авторизуемся на [My Telegram](https://my.telegram.org)
 
-оттуда берем id и hash
+Далее берём оттуда API ID и API HASH
 
 # Добавление аккаунтов
 `cd sessions`
