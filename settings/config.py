@@ -4,13 +4,13 @@ import os
 trigger = ''
 
 #id основного аккаунта
-my_id = 
+my_id =
 
 #уведомления
 notification = ' '
 
 #количество кругов
-range_acc =
+range_acc = 0
 
 #поиск стикера/видео в папке
 stickers = os.listdir('media/')
@@ -27,4 +27,4 @@ color_number = "bold purple"
 first_name = ['']
 
 #Пример: ['привет', 'а', 'б']
-text = ['']
+text = []
