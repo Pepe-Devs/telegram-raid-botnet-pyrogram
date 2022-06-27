@@ -27,7 +27,7 @@ class ChangePhoto(SettingsFunction):
 			me = app.get_me()
 			try:
 				app.set_profile_photo(
-					photo="photo/"+random.choice(photo)
+					photo="media/photo/"+random.choice(photo)
 					   )
 			except Exception as error:
 				console.print(f'[bold red]ERROR[/]:{me.first_name} {error}')

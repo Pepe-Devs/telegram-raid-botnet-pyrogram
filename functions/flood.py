@@ -5,7 +5,7 @@ from rich.prompt import Prompt, Confirm
 from rich.progress import track
 from multiprocessing import Process
 import sys
-import random	
+import random
 
 
 from settings.config import *
@@ -18,24 +18,25 @@ class FloodChat(SettingsFunction):
     """flood to chat"""
     def __init__(self, connect_sessions, initialize):
         self.connect_sessions = connect_sessions
-        
+        self.users_id = None
+
         if initialize:
             console.print('[bold red]cannot be used with initialization')
             sys.exit()
-            
+
         self.flood_menu = console.input(
 '''[bold]
 [1] - raid text
 [2] - raid stickers/video
 [3] - raid photo
 >> ''')
-        
+
         self.notify = Confirm.ask('[bold red]notify users?')
         if self.notify:
             self.notify_admins = Confirm.ask('[bold red]notify_admins?')
-        
+
         self.start_process_flood()
-        
+
     async def flood(self, app, chat_id, reply_msg_id):
         self.chat_id = chat_id
         self.reply_msg_id = reply_msg_id
@@ -47,18 +48,19 @@ class FloodChat(SettingsFunction):
             async for member in app.get_chat_members(self.chat_id):
                 if member.status in ["creator", "administrator"] and not self.notify_admins:
                     continue
-                
+
                 self.users_id.append(str(member.user.id))
-        else:
-            self.users_id = ['']
-        
+
         errors_count = 0
         count = 0
+
         for _ in range(range_acc):
+            if self.users_id:
+                self.users_id = random.choice(self.users_id)
             try:
                 await self.flood_start(
                     app,
-                    random.choice(self.users_id),
+                    self.users_id,
                     self.chat_id,
                     self.reply_msg_id
                     )
@@ -68,7 +70,7 @@ class FloodChat(SettingsFunction):
             except Exception as error:
                 errors_count += 1
                 console.print(f'[bold red]not sent [{errors_count}][/]:{self.me.first_name} {error}')
-                
+
             if errors_count == 3:
                 break
 
@@ -86,7 +88,7 @@ class FloodChat(SettingsFunction):
     async def flood_stickers(self, app, chat_id, reply_msg_id):
         await app.send_document(
             self.chat_id,
-            'media/'+random.choice(stickers),
+            'media/sticker/'+random.choice(stickers),
             reply_to_message_id=self.reply_msg_id
             )
 
@@ -94,7 +96,7 @@ class FloodChat(SettingsFunction):
     async def flood_photo(self, app, chat_id, reply_msg_id):
         await app.send_photo(
             self.chat_id,
-            'photo/'+random.choice(photo),
+            'media/photo/'+random.choice(photo),
             caption=random.choice(text_photo),
             reply_to_message_id=self.reply_msg_id
             )
@@ -115,20 +117,20 @@ class FloodChat(SettingsFunction):
                     await self.flood(app, message.chat.id, reply_msg_id)
 
             idle()
-            
+
         except Exception as error:
             console.print(f'[bold red]ERROR[/]: {error}')
 
     def start_process_flood(self):
         self.account_count(self.connect_sessions)
         self.delay = Prompt.ask("[bold red]delay[/]", default="0")
-                  
+
         processes = []
 
         for num_accs, session in enumerate(
-                self.connect_sessions, 
+                self.connect_sessions,
                 start=1):
-            
+
             process = Process(
                 target=self.handler, args=(session, num_accs,)
                 )
