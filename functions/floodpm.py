@@ -11,47 +11,47 @@ from settings.config import color_number
 console = Console(theme=Theme({"repr.number": color_number}))
 
 class FloodMP(SettingsFunction):
-	"""flood to PM"""
-	
-	def __init__(self, connect_sessions, initialize):
-		self.connect_sessions = connect_sessions
-		self.initialize = initialize
+    """flood to PM"""
 
-		self.account_count(self.connect_sessions)
+    def __init__(self, connect_sessions, initialize):
+        self.connect_sessions = connect_sessions
+        self.initialize = initialize
 
-		self.users = console.input('[bold red]USER:[/] ')
-		self.text_flood = console.input('[bold red]Message flood>[/] ')
+        self.account_count(self.connect_sessions)
 
-		self.delay = Prompt.ask(
-			"[bold red]delay[/]",
-			default="0"
-		)
+        self.users = console.input('[bold red]USER:[/] ')
+        self.text_flood = console.input('[bold red]Message flood>[/] ')
 
-		asyncio.get_event_loop().run_until_complete(
-			asyncio.gather(*[
-					self.flood_pm(session)
-					for session in self.connect_sessions
-				])
-			)
+        self.delay = Prompt.ask(
+            "[bold red]delay[/]",
+            default="0"
+        )
 
-	async def flood_pm(self, session):
-		if not self.initialize:
-			await session.connect()
+        asyncio.get_event_loop().run_until_complete(
+            asyncio.gather(*[
+                    self.flood_pm(session)
+                    for session in self.connect_sessions
+                ])
+            )
 
-		me = await session.get_me()
+    async def flood_pm(self, session):
+        if not self.initialize:
+            await session.connect()
 
-		count = 0
+        me = await session.get_me()
 
-		while True:
-			try:
-				await session.send_message(
-						self.users,
-						self.text_flood
-					)
-				count += 1
-				console.print(f'[{me.first_name}] [bold green]sent: [{count}]')
+        count = 0
 
-			except Exception as error:
-				console.print(f'[bold red]ERROR[/]:{me.first_name} {error}')
+        while True:
+            try:
+                await session.send_message(
+                        self.users,
+                        self.text_flood
+                    )
+                count += 1
+                console.print(f'[{me.first_name}] [bold green]sent: [{count}]')
 
-			await asyncio.sleep(int(self.delay))
+            except Exception as error:
+                console.print(f'[bold red]ERROR[/]:{me.first_name} {error}')
+
+            await asyncio.sleep(int(self.delay))

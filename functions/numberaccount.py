@@ -18,7 +18,7 @@ console = Console(theme=Theme({"repr.number": color_number}))
 
 class Checkingnumber:
     """country of the number"""
-    
+
     def __init__(self, connect_sessions, initialize):
         self.initialize = initialize
         self.connect_sessions = connect_sessions

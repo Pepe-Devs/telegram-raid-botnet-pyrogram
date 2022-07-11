@@ -10,60 +10,60 @@ from settings.config import color_number
 console = Console(theme=Theme({"repr.number": color_number}))
 
 class Vote(SettingsFunction):
-	'''voting in the survey'''
-	
-	def __init__(self, connect_sessions, initialize):
-		self.connect_sessions = connect_sessions
-		self.initialize = initialize
+    '''voting in the survey'''
 
-		console.print(
-			'[magenta]does not work if the survey is a response to another message[/]'
-		)
+    def __init__(self, connect_sessions, initialize):
+        self.connect_sessions = connect_sessions
+        self.initialize = initialize
 
-		self.account_count(connect_sessions)
+        console.print(
+            '[magenta]does not work if the survey is a response to another message[/]'
+        )
 
-		self.link = console.input(
-				'[bold red]link to the message>[/] '
-			)
+        self.account_count(connect_sessions)
 
-		self.option = int(console.input(
-				'[bold red]option number[blue](1-10)[/]: '
-			))-1
+        self.link = console.input(
+                '[bold red]link to the message>[/] '
+            )
 
-		for session in track(
-			self.connect_sessions,
-			description='[bold]VOTED'
-		):
-			self.voited(session)
+        self.option = int(console.input(
+                '[bold red]option number[blue](1-10)[/]: '
+            ))-1
 
-	def voited(self, session):
-		if not self.initialize:
-			session.connect()
+        for session in track(
+            self.connect_sessions,
+            description='[bold]VOTED'
+        ):
+            self.voited(session)
 
-		me = session.get_me()
+    def voited(self, session):
+        if not self.initialize:
+            session.connect()
 
-		try:
-			peer = ''.join(self.link.split('/')[-2:-1])
-			post_id = int(self.link.split('/')[-1])
+        me = session.get_me()
 
-			if peer.isdigit():
-				peer = int(f'-100{peer}')
+        try:
+            peer = ''.join(self.link.split('/')[-2:-1])
+            post_id = int(self.link.split('/')[-1])
 
-		except Exception as error:
-			console.print(
-				'[bold red]ERROR[/]:{name} {error}'
-				.format(
-					name=me.first_name,
-					error=error
-				)
-			)
+            if peer.isdigit():
+                peer = int(f'-100{peer}')
 
-		try:
-			session.vote_poll(
-				peer,
-				post_id,
-				self.option
-			)
+        except Exception as error:
+            console.print(
+                '[bold red]ERROR[/]:{name} {error}'
+                .format(
+                    name=me.first_name,
+                    error=error
+                )
+            )
 
-		except Exception as error:
-			console.print(f'[bold red]ERROR[/]:{me.first_name} {error}')
+        try:
+            session.vote_poll(
+                peer,
+                post_id,
+                self.option
+            )
+
+        except Exception as error:
+            console.print(f'[bold red]ERROR[/]:{me.first_name} {error}')

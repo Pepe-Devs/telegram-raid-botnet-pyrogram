@@ -50,11 +50,11 @@ class ReactionMessage(SettingsFunction):
                 ))
 
         asyncio.get_event_loop().run_until_complete(
-    		asyncio.gather(*[
-            		self.reaction(session)
-            		for session in self.connect_sessions
-        		])
-        	)
+            asyncio.gather(*[
+                    self.reaction(session)
+                    for session in self.connect_sessions
+                ])
+            )
 
     async def reaction(self, session):
         if not self.initialize:

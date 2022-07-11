@@ -19,7 +19,7 @@ console = Console(theme=Theme({"repr.number": color_number}))
 
 class FloodChat(SettingsFunction):
     """flood to chat"""
-    
+
     def __init__(self, connect_sessions, initialize):
         self.connect_sessions = connect_sessions
         self.users_id = None

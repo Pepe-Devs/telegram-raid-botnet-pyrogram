@@ -23,44 +23,44 @@ data = {"storage_sessions": []}
 
 
 if menu == '1':
-	app = Client(name, api_id, api_hash)
-	with app:
-		me = app.get_me()
-		print([me.first_name])
+    app = Client(name, api_id, api_hash)
+    with app:
+        me = app.get_me()
+        print([me.first_name])
 
 elif menu == '2':
 
-	data = {"storage_sessions": []}
-	for session in glob.glob('*.session'):
-		session = session[:-8]
+    data = {"storage_sessions": []}
+    for session in glob.glob('*.session'):
+        session = session[:-8]
 
-		try:
-			app = Client(session, api_id, api_hash, in_memory=False)
-			app.connect()
-			me = app.get_me()
-			string = app.export_session_string()
-			data['storage_sessions'].append(string)
-			print(f'[+]{me.first_name} {me.id} {session}')
+        try:
+            app = Client(session, api_id, api_hash, in_memory=False)
+            app.connect()
+            me = app.get_me()
+            string = app.export_session_string()
+            data['storage_sessions'].append(string)
+            print(f'[+]{me.first_name} {me.id} {session}')
 
-			app.disconnect() 
-		except Exception as error:
-			console.print(f'[bold red]ERROR[bold white]: {session} {error}')
+            app.disconnect()
+        except Exception as error:
+            console.print(f'[bold red]ERROR[bold white]: {session} {error}')
 
 
-	with open("sessions.json", "w") as write_file:
-		json.dump(data, write_file, indent = 4)
+    with open("sessions.json", "w") as write_file:
+        json.dump(data, write_file, indent = 4)
 
 elif menu == '3':
-	def checking(session):
-		try:
-			app = Client(session, api_id, api_hash)
-			app.connect()
-			me = app.get_me()
-			print(me.first_name)
-			app.disconnect()
-		except:
-			print(f'ERROR: {session}')
-			os.system(f'mv {session}.session dead')
+    def checking(session):
+        try:
+            app = Client(session, api_id, api_hash)
+            app.connect()
+            me = app.get_me()
+            print(me.first_name)
+            app.disconnect()
+        except:
+            print(f'ERROR: {session}')
+            os.system(f'mv {session}.session dead')
 
-	for session in glob.glob('*.session'):
-		checking(session[:-8])
+    for session in glob.glob('*.session'):
+        checking(session[:-8])

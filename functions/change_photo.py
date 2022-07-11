@@ -12,30 +12,30 @@ console = Console(theme=Theme({"repr.number": color_number}))
 
 
 class ChangePhoto(SettingsFunction):
-	"""change profile photo"""
+    """change profile photo"""
 
-	def __init__(self, connect_sessions, initialize):
-		console.print(
-			'Photos are taken from the "photo" folder',
-			'Press "ENTER"',
-			'[bold white]If you change your mind, press CTRL C[/]',
-			sep='\n',
-			style='bold magenta'
-		)
+    def __init__(self, connect_sessions, initialize):
+        console.print(
+            'Photos are taken from the "photo" folder',
+            'Press "ENTER"',
+            '[bold white]If you change your mind, press CTRL C[/]',
+            sep='\n',
+            style='bold magenta'
+        )
 
-		console.input()
+        console.input()
 
-		for session in track(connect_sessions):
-			if not initialize:
-				session.connect()
+        for session in track(connect_sessions):
+            if not initialize:
+                session.connect()
 
-			me = session.get_me()
+            me = session.get_me()
 
-			try:
-				file = random.choice(
-					os.listdir("resources")
-					)
-				session.set_profile_photo(photo=f'resources/{file}')
+            try:
+                file = random.choice(
+                    os.listdir("resources")
+                    )
+                session.set_profile_photo(photo=f'resources/{file}')
 
-			except Exception as error:
-				console.print(f'[bold red]ERROR[/]:{me.first_name} {error}')
+            except Exception as error:
+                console.print(f'[bold red]ERROR[/]:{me.first_name} {error}')
