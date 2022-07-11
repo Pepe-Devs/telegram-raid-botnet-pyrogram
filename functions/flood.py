@@ -3,10 +3,13 @@ from pyrogram import Client, idle
 import asyncio
 from rich.prompt import Prompt, Confirm
 from rich.progress import track
-from multiprocessing import Process
+from multiprocessing import Process, Manager
 import sys
 import random
+import time
+import os
 
+from pyrogram.raw import functions, types
 
 from settings.config import *
 from settings.function import SettingsFunction
@@ -16,6 +19,7 @@ console = Console(theme=Theme({"repr.number": color_number}))
 
 class FloodChat(SettingsFunction):
     """flood to chat"""
+    
     def __init__(self, connect_sessions, initialize):
         self.connect_sessions = connect_sessions
         self.users_id = None
@@ -24,29 +28,46 @@ class FloodChat(SettingsFunction):
             console.print('[bold red]cannot be used with initialization')
             sys.exit()
 
-        self.flood_menu = console.input(
-'''[bold]
-[1] - raid text
-[2] - raid stickers/video
-[3] - raid photo
->> ''')
+        self.flood_menu = (
+            ('raid text', self.flood_text),
+            ('raid media', self.flood_media)
+        )
+
+        for number, function in enumerate(self.flood_menu, 1):
+            console.print(
+                '[{number}] {name}'
+                .format(
+                    number=number,
+                    name=function[0]
+                )
+            )
+
+        choice = int(
+            console.input(
+            '[bold white]>> [/]'
+            )
+        )-1
+
+        self.function = self.flood_menu[choice][1]
 
         self.notify = Confirm.ask('[bold red]notify users?')
+
         if self.notify:
             self.notify_admins = Confirm.ask('[bold red]notify_admins?')
 
         self.start_process_flood()
 
-    async def flood(self, app, chat_id, reply_msg_id):
+    async def flood(self, session, chat_id, reply_msg_id):
         self.chat_id = chat_id
         self.reply_msg_id = reply_msg_id
 
-        self.me = await app.get_me()
+        self.me = await session.get_me()
 
         if self.notify:
             self.users_id = []
-            async for member in app.get_chat_members(self.chat_id):
-                if member.status in ["creator", "administrator"] and not self.notify_admins:
+            async for member in session.get_chat_members(self.chat_id):
+                if member.status in ["creator", "administrator"] \
+                    and not self.notify_admins:
                     continue
 
                 self.users_id.append(str(member.user.id))
@@ -54,67 +75,79 @@ class FloodChat(SettingsFunction):
         errors_count = 0
         count = 0
 
-        for _ in range(range_acc):
-            if self.users_id:
-                self.users_id = random.choice(self.users_id)
+        while count < message_count:
+            if not self.notify:
+                self.text = random.choice(text)
+            else:
+                self.text = '<a href=\"tg://user?id={user_id}\"> </a>{message}'.format(
+                    user_id=random.choice(self.users_id),
+                    message=random.choice(text)
+                )
+
             try:
-                await self.flood_start(
-                    app,
-                    self.users_id,
-                    self.chat_id,
-                    self.reply_msg_id
+                await self.function(
+                        session,
+                        self.chat_id,
+                        self.reply_msg_id
                     )
+
                 count += 1
-                console.print(f'[{self.me.first_name}] [bold green]sent[/] COUNT: [{count}]')
+
+                console.print(
+                    f'[{self.me.first_name}] [bold green]sent[/] COUNT: [{count}]'
+                    )
 
             except Exception as error:
-                errors_count += 1
-                console.print(f'[bold red]not sent [{errors_count}][/]:{self.me.first_name} {error}')
+                console.print(
+                        '[bold red]not sent [{}][/]:{name} {error}'
+                        .format(
+                            errors_count,
+                            name=self.me.first_name,
+                            error=error
+                        )
+                    )
 
-            if errors_count == 3:
+                errors_count += 1
+
+            if errors_count >= 3:
                 break
 
             await asyncio.sleep(int(self.delay))
 
-
-    async def flood_text(self, app, users_id, chat_id, reply_msg_id):
-        await app.send_message(
-            chat_id,
-            (f'<a href=\"tg://user?id={users_id}\">'+notification+'</a>'+random.choice(text)),
-            reply_to_message_id=reply_msg_id
+    async def flood_text(self, session, chat_id, reply_msg_id):
+        await session.send_message(
+                chat_id,
+                self.text,
+                reply_to_message_id=reply_msg_id
             )
 
+    async def flood_media(self, session, chat_id, reply_msg_id):
+        file = random.choice(os.listdir('media'))
 
-    async def flood_stickers(self, app, chat_id, reply_msg_id):
-        await app.send_document(
-            self.chat_id,
-            'media/sticker/'+random.choice(stickers),
-            reply_to_message_id=self.reply_msg_id
+        await session.send_document(
+                self.chat_id,
+                f'media/{file}',
+                reply_to_message_id=reply_msg_id
             )
 
-
-    async def flood_photo(self, app, chat_id, reply_msg_id):
-        await app.send_photo(
-            self.chat_id,
-            'media/photo/'+random.choice(photo),
-            caption=random.choice(text_photo),
-            reply_to_message_id=self.reply_msg_id
-            )
-
-
-    def handler(self, app, num_accs):
+    def handler(self, session, num_accs):
         try:
-            app.start()
-            console.log(f'initialized[*]{num_accs}')
-            @app.on_message()
+            session.start()
+            console.log(f'initialized/{num_accs}')
+            @session.on_message()
             async def main(client, message):
                 if message.reply_to_message:
                     reply_msg_id = message.reply_to_message_id
                 else:
                     reply_msg_id = False
 
-                if message.text == trigger and message.from_user.id == my_id:
-                    await self.flood(app, message.chat.id, reply_msg_id)
+                if message.text == trigger \
+                    and message.from_user.id == my_id:
+                    await self.flood(
+                            session,
+                            message.chat.id,
+                            reply_msg_id
+                        )
 
             idle()
 
@@ -127,17 +160,19 @@ class FloodChat(SettingsFunction):
 
         processes = []
 
-        for num_accs, session in enumerate(
-                self.connect_sessions,
-                start=1):
+        for num_accs, session in enumerate(self.connect_sessions):
 
             process = Process(
-                target=self.handler, args=(session, num_accs,)
+                    target=self.handler,
+                    args=(session, num_accs)
                 )
+
             process.start()
             processes.append(process)
 
-        console.print(f'[*][bold white]SEND "[yellow]{trigger}[/]" to chat[/]')
+        console.print(
+            f'[*][bold white]SEND "[yellow]{trigger}[/]" to chat[/]'
+            )
 
         for process in processes:
             process.join()

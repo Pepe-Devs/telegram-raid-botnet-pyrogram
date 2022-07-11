@@ -10,44 +10,60 @@ from settings.config import color_number
 console = Console(theme=Theme({"repr.number": color_number}))
 
 class Vote(SettingsFunction):
-	'''vote in chat'''
+	'''voting in the survey'''
+	
 	def __init__(self, connect_sessions, initialize):
-		
+		self.connect_sessions = connect_sessions
 		self.initialize = initialize
 
+		console.print(
+			'[magenta]does not work if the survey is a response to another message[/]'
+		)
+
 		self.account_count(connect_sessions)
-		
-		self.link = console.input('[bold red]message[/]> ')
-		self.option = int(console.input('[bold red]option number[blue](1-10)[/]: '))-1
-		
-		for app in track(connect_sessions,
-				   description='[bold]VOTED'
-				   ):
-			self.voited(app)
-			
-			
-	def voited(self, app):
+
+		self.link = console.input(
+				'[bold red]link to the message>[/] '
+			)
+
+		self.option = int(console.input(
+				'[bold red]option number[blue](1-10)[/]: '
+			))-1
+
+		for session in track(
+			self.connect_sessions,
+			description='[bold]VOTED'
+		):
+			self.voited(session)
+
+	def voited(self, session):
 		if not self.initialize:
-			app.connect()
-		
-		me = app.get_me()
-		
+			session.connect()
+
+		me = session.get_me()
+
 		try:
-			link = self.link.split('/')
-			if link[3] == 'c':
-				link_channel = int('-100'+link[4])
-				post_id = int(link[5])
-			else:
-				link_channel = link[3]
-				post_id = int(link[4])
-			
-			
+			peer = ''.join(self.link.split('/')[-2:-1])
+			post_id = int(self.link.split('/')[-1])
+
+			if peer.isdigit():
+				peer = int(f'-100{peer}')
+
+		except Exception as error:
+			console.print(
+				'[bold red]ERROR[/]:{name} {error}'
+				.format(
+					name=me.first_name,
+					error=error
+				)
+			)
+
+		try:
+			session.vote_poll(
+				peer,
+				post_id,
+				self.option
+			)
+
 		except Exception as error:
 			console.print(f'[bold red]ERROR[/]:{me.first_name} {error}')
-		
-		try:
-			app.vote_poll(link_channel, post_id, self.option)
-		
-		except Exception as error:
-			console.print(f'[bold red]ERROR[/]:{me.first_name} {error}')
-		

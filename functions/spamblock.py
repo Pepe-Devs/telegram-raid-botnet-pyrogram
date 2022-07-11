@@ -2,6 +2,10 @@ from pyrogram import Client
 from rich.console import Console, Theme
 import re
 import asyncio
+from rich.progress import track
+
+from rich import box
+from rich.table import Table
 
 from settings.function import SettingsFunction
 from settings.config import color_number
@@ -10,52 +14,73 @@ console = Console(theme=Theme({"repr.number": color_number}))
 
 class SpamBlock(SettingsFunction):
     """checking accounts for spam block"""
+
     def __init__(self, connect_sessions, initialize):
         self.connect_sessions = connect_sessions
         self.initialize = initialize
 
-        self.permanent_block = []
-        self.no_spamblock = []
-        self.time_block = []
+        self.message_en = 'Good news, no limits are currently applied to your account. You’re free as a bird!'
+        self.message_ru = 'Ваш аккаунт свободен от каких-либо ограничений.'
 
-        for app in self.connect_sessions:
+        self.table = Table(
+            title='[bold red]SpamBlock',
+            box=box.ROUNDED
+            )
+
+        self.table.add_column("Name")
+        self.table.add_column("Number")
+        self.table.add_column("Block")
+
+        for session in track(
+            self.connect_sessions,
+            '[bold yellow]Verification, please expect...[/]'
+        ):
             if not self.initialize:
-                app.connect()
+                session.connect()
+
             try:
-                self.me = app.get_me()
-                app.send_message('SpamBot', '/start')
+                self.me = session.get_me()
+                session.send_message('SpamBot', '/start')
 
             except Exception as error:
-                app.unblock_user(178220800)
-                console.print(f'[bold red]ERROR[white bold]: <I tried to unban the bot, try again!>[/] {self.me.first_name} {error}')
+                session.unblock_user(178220800)
+                console.print(
+                    '[bold red]ERROR[white bold]: <I tried to unban the bot, try again!>[/]',
+                    {self.me.first_name},
+                    {error}
+                )
 
-            self.checking_block(app)
+            self.checking_block(session)
 
-        console.print(f"""[bold]
-perpetual block count: {len(self.permanent_block)}
-no spamblock: {len(self.no_spamblock)}
-temporary spam block: {len(self.time_block)}
-        """)
+        console.print(self.table)
 
-    def checking_block(self, app):
+    def checking_block(self, session):
+        messages = session.get_chat_history('SpamBot', limit=1)
+        message = [text for text in messages][0]
 
-        self.message = app.get_chat_history('SpamBot', limit=1)
+        if message.text == '/start':
+            self.checking_block(session)
 
-        for msg in self.message:
-            if msg.text == '/start':
-                self.checking_block(app)
+        else:
+            try:
+                if message.text in (self.message_ru, self.message_en):
+                    self.table.add_row(
+                        self.me.first_name,
+                        self.me.phone_number,
+                        '[bold green][+][/]'
+                    )
 
-            else:
-                try:
-                    if msg.text == 'Good news, no limits are currently applied to your account. You’re free as a bird!':
-                        console.print(f'[bold green][+][/] [{self.me.first_name}] id:[{self.me.id}]')
-                        self.no_spamblock.append(app)
+                else:
+                    text = str(re.findall(r"\d+\s\w+\s\d{4}", message.text)[0])
+                    self.table.add_row(
+                        self.me.first_name,
+                        self.me.phone_number,
+                        text
+                    )
 
-                    else:
-                        text = re.findall(r"\d+\s\w+\s\d{4}", msg.text)
-                        console.print(f'[bold red][-][/] [{self.me.first_name}] id:[{self.me.id}] = {text[0]}')
-                        self.time_block.append(app)
-
-                except:
-                    console.print(f'[bold red][-][/] [{self.me.first_name}] id:[{self.me.id}]')
-                    self.permanent_block.append(app)
+            except:
+                self.table.add_row(
+                    self.me.first_name,
+                    self.me.phone_number,
+                    '[bold red][-][/]'
+                )

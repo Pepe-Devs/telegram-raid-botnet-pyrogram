@@ -2,43 +2,105 @@ from pyrogram import Client
 from rich.console import Console, Theme
 import asyncio
 from rich.progress import track
+from rich.prompt import Confirm
+import random
 
 from settings.function import SettingsFunction
-from settings.config import color_number
+from settings.config import color_number, reaction_count, emoji
 
 console = Console(theme=Theme({"repr.number": color_number}))
 
 class ReactionMessage(SettingsFunction):
     """reaction raid"""
+
     def __init__(self, connect_sessions, initialize):
         self.initialize = initialize
-        
+        self.emoji = emoji
+
+        mode = (
+            ('adding reactions to a message', self.add_reaction),
+            ('reaction raid (on existing messages)', self.flood_reaction)
+        )
+
+        for number, function in enumerate(mode, 1):
+            console.print(
+                '[{number}] {name}'
+                .format(
+                    number=number,
+                    name=function[0]
+                ),
+                style='bold white'
+            )
+
+        choice = int(
+            console.input(
+                '[bold white]>> [/]'
+            ))-1
+
+        self.function = mode[choice][1]
+
         self.account_count(connect_sessions)
 
-        self.link_message = console.input('[bold red]link message: ')
-        self.emoji = console.input('[bold red]emoji> ')
+        self.link = console.input('[bold red]link(to any message in the chat)> ')
+        self.mix_reacion = Confirm.ask('[bold red]use random reactions?[/]')
 
-        for app in track(self.connect_sessions,
-        description='[bold white]REACTION'):
-            self.reaction(app)
-        
+        if not self.mix_reacion:
+            self.emoji = list(console.input(
+                    '[bold red]emoji(there may be several of them)> [/]'
+                ))
 
-    def reaction(self, app):
+        asyncio.get_event_loop().run_until_complete(
+    		asyncio.gather(*[
+            		self.reaction(session)
+            		for session in self.connect_sessions
+        		])
+        	)
+
+    async def reaction(self, session):
         if not self.initialize:
-            app.connect()
+            await session.connect()
 
-        me = app.get_me()
-       
-        link = self.link_message.split('/')
-        if link[3] == 'c':
-            link_channel = int('-100'+link[4])
-            post_id = int(link[5])
-        else:
-            link_channel = link[3]
-            post_id = int(link[4])
-               
+        me = await session.get_me()
+
+        peer = ''.join(self.link.split('/')[-2:-1])
+        post_id = int(self.link.split('/')[-1])
+
+        if peer.isdigit():
+            peer = int(f'-100{peer}')
+
+        errors_count = 0
+
         try:
-            app.send_reaction(link_channel, post_id, self.emoji)
-            
+            await self.function(session, peer, post_id)
+            console.print(
+                f'[{me.first_name}] [bold green]appreciated[/]!'
+            )
+
         except Exception as error:
-            console.print(f'[bold red]ERROR[/]:{me.first_name} {error}')
+            errors_count += 1
+            console.print(
+                    f'[{me.first_name}] [bold red]not rated[/]: {error}'
+                )
+
+    async def add_reaction(self, session, peer, post_id):
+        await session.send_reaction(
+            peer,
+            post_id,
+            random.choice(
+                self.emoji
+            )
+        )
+
+    async def flood_reaction(self, session, peer, post_id):
+        messages = session.get_chat_history(peer)
+
+        async for message in messages:
+            try:
+                await self.add_reaction(
+                    session,
+                    peer,
+                    message.id
+                )
+
+            except Exception as error:
+                console.print(error)

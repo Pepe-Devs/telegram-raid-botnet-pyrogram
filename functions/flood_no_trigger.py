@@ -16,4 +16,4 @@ from settings.config import color_number
 console = Console(theme=Theme({"repr.number": color_number}))
 
 class FloodChatNoTrigger(FloodChat):
-    """flood to chat no trigger(I'm redoing it)"""
+    """flood in a chat without a trigger(I'm redoing it)"""
