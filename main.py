@@ -8,11 +8,13 @@ from settings.config import color_number
 
 console = Console(theme=Theme({"repr.number": color_number}))
 
-console.print('''
+console.print(
+    """
 [bold]idea taken from https://t.me/huis_bn
 GitHub botnet on telethon: https://github.com/json1c/telegram-raid-botnet
 GitHub botnet on pyrogram: https://github.com/Madara225/telegram-raid-botnet-pyrogram
-''')
+    """
+)
 
 accounts = ConnectSessions()
 list_function = MenuSettings()

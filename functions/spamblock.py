@@ -45,9 +45,7 @@ class SpamBlock(SettingsFunction):
             except Exception as error:
                 session.unblock_user(178220800)
                 console.print(
-                    '[bold red]ERROR[white bold]: <I tried to unban the bot, try again!>[/]',
-                    {self.me.first_name},
-                    {error}
+                    f'[bold red]ERROR[white bold]: <I tried to unban the bot, try again!>[/]{self.me.first_name} {error}'
                 )
 
             self.checking_block(session)
@@ -58,29 +56,26 @@ class SpamBlock(SettingsFunction):
         messages = session.get_chat_history('SpamBot', limit=1)
         message = [text for text in messages][0]
 
+        name = self.me.first_name
+        number = self.me.phone_number
+
         if message.text == '/start':
             self.checking_block(session)
 
         else:
-            try:
-                if message.text in (self.message_ru, self.message_en):
-                    self.table.add_row(
-                        self.me.first_name,
-                        self.me.phone_number,
-                        '[bold green][+][/]'
-                    )
+            if not message.text in (self.message_ru, self.message_en):
+                if "sending spam" in message.text:
+                        result = '[bold red][-][/]'
 
                 else:
-                    text = str(re.findall(r"\d+\s\w+\s\d{4}", message.text)[0])
-                    self.table.add_row(
-                        self.me.first_name,
-                        self.me.phone_number,
-                        text
-                    )
+                    date = re.findall(r"\d+\s\w+\s\d{4}", message.text)
+                    result = date[0]
 
-            except:
-                self.table.add_row(
-                    self.me.first_name,
-                    self.me.phone_number,
-                    '[bold red][-][/]'
-                )
+            else:
+                result = '[bold green][+][/]'
+
+        self.table.add_row(
+            name,
+            number,
+            result
+        )

@@ -6,7 +6,7 @@ from rich.prompt import Confirm
 import random
 
 from settings.function import SettingsFunction
-from settings.config import color_number, reaction_count, emoji
+from settings.config import color_number, emoji
 
 console = Console(theme=Theme({"repr.number": color_number}))
 

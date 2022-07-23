@@ -18,6 +18,7 @@ class Joined(FloodChat):
     def __init__(self, connect_sessions, initialize):
         self.initialize = initialize
         self.connect_sessions = connect_sessions
+        self.join_flood = None
 
         self.account_count(self.connect_sessions)
 
@@ -32,7 +33,7 @@ class Joined(FloodChat):
             '[bold white]>> [/]'
             )
 
-        link = console.input(f'[bold red]link:[/] ')
+        link = console.input(f'[bold red]link> [/]')
 
         if '/+' in link:
             self.link = link.replace('/+', '/joinchat/') #/+ криво работает в pyrogram
@@ -48,25 +49,27 @@ class Joined(FloodChat):
 
         asyncio.get_event_loop().run_until_complete(self.start_joined())
 
+    async def join_chat(self, session):
+        if not self.initialize:
+            await session.start()
+
+        me = await session.get_me()
+
+        try:
+            if self.mode == '1':
+                self.chat = self.link
+
+            else:
+                channel = await session.get_chat(self.link)
+                self.chat = channel.linked_chat.id
+
+            await session.join_chat(self.chat)
+
+        except Exception as error:
+            console.print(f'[bold red]did not join[/]: {error}')
+
     async def start_joined(self):
-        if self.settings_join == 'fast':
-
-            joined = 0
-            start = perf_counter()
-
-            with console.status("[bold]JOIN", spinner='aesthetic'):
-                tasks = await asyncio.gather(*[
-                    self.join_chat(session)
-                    for session in self.connect_sessions
-                ])
-
-                for result in tasks:
-                    joined += 1
-
-                join_time = round(perf_counter() - start, 2)
-                console.print(f"[+] {joined} bots joined [yellow]{join_time}[/]s")
-
-        elif self.settings_join == 'norm':
+        if self.settings_join == 'norm':
 
             self.captcha = Confirm.ask('[bold red]captcha?')
             time_normal = int(console.input('[bold blue]delay>[/] '))
@@ -80,13 +83,41 @@ class Joined(FloodChat):
                 await asyncio.sleep(time_normal)
 
                 if self.captcha:
-                    await self.solve_captcha(session, self.link)
+                    await self.solve_captcha(session, self.chat)
 
-    async def solve_captcha(self, session, link):
+        elif self.settings_join == 'fast':
+            self.join_flood = Confirm.ask('[bold red]flood after joining?[/]')
+
+            if self.join_flood:
+                initialize = True
+                flood = FloodChat(self.connect_sessions, initialize)
+                flood.ask()
+
+            joined = 0
+            start = perf_counter()
+
+            tasks = await asyncio.gather(*[
+                self.join_chat(session)
+                for session in self.connect_sessions
+            ])
+
+            for result in tasks:
+                joined += 1
+
+            join_time = round(perf_counter() - start, 2)
+            console.print(f"[+] {joined} bots joined [yellow]{join_time}[/]s")
+
+        if self.join_flood:
+            await asyncio.gather(*[
+                flood.flood(session, self.chat, reply_msg_id=None)
+                for session in self.connect_sessions
+            ])
+
+
+    async def solve_captcha(self, session, chat_id):
         sleep(time_captcha)
 
-        chat = await session.get_chat(link)
-        message = session.get_chat_history(chat.id, limit=5)
+        message = session.get_chat_history(chat_id, limit=5)
 
         async for msg in message:
             try:
@@ -94,26 +125,9 @@ class Joined(FloodChat):
                     .inline_keyboard[0][0].callback_data
 
                 await session.request_callback_answer(
-                    chat.id,
+                    chat_id,
                     msg.id,
                     callback
                 )
             except:
                 pass
-
-    async def join_chat(self, session):
-        if not self.initialize:
-            await session.connect()
-
-        me = await session.get_me()
-
-        try:
-            if self.mode == '1':
-                await session.join_chat(self.link)
-
-            elif self.mode == '2':
-                channel = await session.get_chat(self.link)
-                await session.join_chat(channel.linked_chat.id)
-
-        except Exception as error:
-            console.print(f'[bold red]did not join[/]: {error}')

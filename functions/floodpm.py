@@ -49,7 +49,7 @@ class FloodMP(SettingsFunction):
                         self.text_flood
                     )
                 count += 1
-                console.print(f'[{me.first_name}] [bold green]sent: [{count}]')
+                console.print(f'[{me.first_name}] [bold green]sent:[/] [{count}]')
 
             except Exception as error:
                 console.print(f'[bold red]ERROR[/]:{me.first_name} {error}')

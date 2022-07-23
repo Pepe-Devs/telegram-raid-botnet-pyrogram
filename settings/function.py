@@ -17,9 +17,8 @@ class SettingsFunction:
         sys.exit()
 
     def account_count(self, connect_sessions):
-        acc_count = int(Prompt.ask(
-            '[bold red]how many accounts to use?',
-            default=str(len(connect_sessions))
-            ))
+        acc_count = int(Prompt.ask('[bold red]how many accounts to use?',
+                            default=str(len(connect_sessions))
+                            ))
 
         self.connect_sessions = random.sample(connect_sessions, acc_count)

@@ -18,10 +18,6 @@ menu = input('''
 
 name = "".join(random.choices(string.ascii_letters, k=10))
 
-
-data = {"storage_sessions": []}
-
-
 if menu == '1':
     app = Client(name, api_id, api_hash)
     with app:
