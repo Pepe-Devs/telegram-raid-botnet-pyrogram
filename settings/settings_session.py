@@ -56,4 +56,3 @@ class ConnectSessions:
         except Exception as error:
             console.log(f'NOT CONNECTED/{error}')
             self.connect_sessions.remove(session)
-        return
