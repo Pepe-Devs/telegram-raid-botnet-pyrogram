@@ -10,7 +10,7 @@ from settings.config import color_number
 console = Console(theme=Theme({"repr.number": color_number}))
 
 class Vote(SettingsFunction):
-    '''voting in the survey'''
+    """voting in the survey"""
 
     def __init__(self, connect_sessions, initialize):
         self.connect_sessions = connect_sessions
