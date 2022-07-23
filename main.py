@@ -16,6 +16,8 @@ GitHub botnet on pyrogram: https://github.com/Madara225/telegram-raid-botnet-pyr
     """
 )
 
+console.print('[bold red]test version[!][/]')
+
 accounts = ConnectSessions()
 list_function = MenuSettings()
 

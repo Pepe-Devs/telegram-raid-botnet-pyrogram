@@ -4,7 +4,7 @@ import os
 trigger = ''
 
 #id основного аккаунта
-my_id = 
+my_id =  
 
 #количество сообщений
 message_count = 999
