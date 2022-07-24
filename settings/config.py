@@ -1,25 +1,25 @@
 import os
 
-#сообщение для начала спама
+# Message trigger, after which spam will start
 trigger = ''
 
-#id основного аккаунта
+# Main account's id
 my_id =  
 
-#количество сообщений
+# Message Count
 message_count = 999
 
-#время после которого идет нажатие на капчу
+# The time that passes after you click on the captcha
 time_captcha = 5
 
-#цвета цифр
+# Colors of numbers
 color_number = "bold magenta"
 
-#имя для аккаунтов. Пример: first_name = ['привет', 'а', 'б']
+# Name for accounts. Example: first_name = ['hello', 'a', 'b']
 first_name = ['']
 
-#реакции
+# Reactions
 emoji = ['👍', '❤️', '🔥', '🥰', '👏', '😁', '🎉', '🤩', '👎', '🤯', '😱', '🤬', '😢', '🤮', '💩', '🙏']
 
-#Пример: text = ['привет', 'а', 'б']
+# Example: text = hello', 'а', 'б']
 text = ['']
