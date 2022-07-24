@@ -1,4 +1,4 @@
-# Устанока
+# Setup
 
 `git clone https://github.com/Madara225/telegram-raid-botnet-pyrogram`
 
@@ -8,36 +8,36 @@
 
 `python3 main.py`
 
-авторизуемся: https://my.telegram.org/
+Authorize: https://my.telegram.org/
 
-оттуда берем id и hash
+After authorizing and creating the application, take your api_id and api_hash
 
-# Добавление аккаунтов
+# Adding accounts
 `cd sessions`
 
 `python3 add_acc.py`
 
-Для начала запускаем первую функцию, вводим номер телефона аккаунта или токен бота.
+To start, start the first function, enter the account phone number or bot token.
 
-После того как добавили все аккаунты, запускаем вторую функцию, она привяжет аккаунты к ботнету.
+After you have added all the accounts, start the second function, it will bind the accounts to the botnet.
 
-Третья функция проверяет аккаунты на валидность, в случае, если аккаунт не валидный, сессия переносится в папку sessions/dead, тем самым, больше не задействуется в ботнете, после этого нужно **обязательно** запустить ещё раз вторую функцию.
+The third function checks accounts for validity; if an account is invalid, the session is moved to the sessions/dead folder, thereby no longer being used by the botnet, after which you **must** run the second function again.
  
 
  
-# Конфиг
+# Config
 `cd settings`
 
-`nano config.py` (в конфиге прокомментированы все переменные)
+`nano config.py` (All variables are commented in the config)
 
-# Запуск
+# Start
 
 `python3 main.py`
  
-Видео-инструкция по запуску ботнета: [YouTube](https://www.youtube.com/watch?v=DKKpfHzMR78)
+Video tutorial on how to start a botnet: [YouTube](https://www.youtube.com/watch?v=DKKpfHzMR78)
 
-Если есть вопросы, Вы можете обратится в наш [чат](https://t.me/pepe_devs)
+If you have any questions, you can contact our [chat](https://t.me/pepe_devs)
 
-Идею и часть кода взял у [huis_bn](https://t.me/huis_bn)
+I got the idea and part of the code from [huis_bn](https://t.me/huis_bn)
 
-Ботнет [huis_bn](https://t.me/huis_bn) > [json1c/telegram-raid-botnet](https://github.com/json1c/telegram-raid-botnet)
+Botnet [huis_bn](https://t.me/huis_bn) > [json1c/telegram-raid-botnet](https://github.com/json1c/telegram-raid-botnet)
