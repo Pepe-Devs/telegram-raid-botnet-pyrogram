@@ -17,7 +17,7 @@
 ## Добавление аккаунтов
 `cd sessions`
 
-`python3 add_acc.py`
+`python3 add_session.py`
 
 Для начала запускаем первую функцию, вводим номер телефона аккаунта или токен бота.
 
@@ -61,7 +61,7 @@ After authorizing and creating the application, take your api_id and api_hash
 ## Adding accounts
 `cd sessions`
 
-`python3 add_acc.py`
+`python3 add_session.py`
 
 To start, start the first function, enter the account phone number or bot token.
 
