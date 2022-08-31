@@ -3,8 +3,8 @@ from pyrogram import Client
 import asyncio
 from rich.progress import track
 import random
+import os
 
-from settings.config import photo
 from settings.function import SettingsFunction
 from settings.config import color_number
 
@@ -12,22 +12,30 @@ console = Console(theme=Theme({"repr.number": color_number}))
 
 
 class ChangePhoto(SettingsFunction):
-	"""change profile photo"""
-	def __init__(self, connect_sessions, initialize):
-		
-		console.input('[magenta]photos are taken from the "photo" folder\n[bold white]press "ENTER"')
-		
-		for app in track(
-					connect_sessions,
-					description='[bold]photo change'
-					):
-			if not initialize:
-				app.connect()
-				
-			me = app.get_me()
-			try:
-				app.set_profile_photo(
-					photo="photo/"+random.choice(photo)
-					   )
-			except Exception as error:
-				console.print(f'[bold red]ERROR[/]:{me.first_name} {error}')
+    """change profile photo"""
+
+    def __init__(self, connect_sessions, initialize):
+        console.print(
+            'Photos are taken from the "photo" folder',
+            'Press "ENTER"',
+            '[bold white]If you change your mind, press CTRL C[/]',
+            sep='\n',
+            style='bold magenta'
+        )
+
+        console.input()
+
+        for session in track(connect_sessions):
+            if not initialize:
+                session.connect()
+
+            me = session.get_me()
+
+            try:
+                file = random.choice(
+                    os.listdir("resources")
+                    )
+                session.set_profile_photo(photo=f'resources/{file}')
+
+            except Exception as error:
+                console.print(f'[bold red]ERROR[/]:{me.first_name} {error}')
